@@ -3,6 +3,15 @@
 // Simply Tracking 
 
 #include <CPutil.h>
+#include <SPI.h>
+#include <MFRC522.h>
+
+// ____________________________________________________________________
+// Tracker Hardware Includes: 1 Red Led, 1 Buzzer, 1 RFID Tag
+
+// Input: RFID Signal
+// Output: LED and Buzzer
+// Manual: When RFID Signal indicates item
 
 const int ledPin = 4;
 
@@ -27,7 +36,7 @@ void loop()
 	
 }
 
-int lostMode();
+int tracker();
 {
   static int lost = false;
   
@@ -37,7 +46,12 @@ int lostMode();
     
     if (lost == true())
     {
-      
+      lostMode();
     }
   }
+}
+
+void lostMode()
+{
+  
 }
