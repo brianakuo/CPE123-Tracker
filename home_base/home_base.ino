@@ -8,11 +8,11 @@
 
 //____________________________________________________________________
 //Sudo Code 
-// HomeBase Hardware Include: 1 Red Led, 1 Green Led, 1 Button, 1 RFID
+// HomeBase Hardware Includes: 1 Red Led, 1 Green Led, 1 Button, 1 RFID Reader
 
 // Input: RFID signal
 // Output: LED
-// Manual: When RFID signal indicate item is in range, Green LED is on. When item is out of range, Red LED is on. 
+// Manual: When RFID signal indicates item is in range, Green LED is on. When item is out of range, Red LED is on. 
 
 
 // Input: Button
