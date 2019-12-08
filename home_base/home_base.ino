@@ -24,9 +24,9 @@
 // Define your pins
 #define SS_PIN 10
 #define RST_PIN 9
-#define redLedPin 4
-#define greenLedPin 3
-#define button 2
+const int redLedPin = 4;
+const int greenLedPin = 3;
+const int button = 2;
 
 
 // Create your hardware
@@ -55,58 +55,71 @@ void setup()
 void loop() 
 {
 	// Call your control function(s) here 
-	detectItem();
+  detectItem();
+  if (buttonPushed())
+  {
+    Serial.print("1");
+  }
+  else
+  {
+    Serial.print("0");
+  }
+  
 }
 
 void detectItem()
 {
-  if (lookingForCard() == true)
+  static MSTimer greenTimer;
+  enum{GREEN, RED};
+  static int state = RED;
+  bool res = lookingForCard();
+
+  switch(state)
   {
-    greenLed.on();
-    redLed.off();
-  }
-  else if (lookingForCard() == false)
+    case(GREEN):
+    if (res == false and greenTimer.done())
+    {
+      redLed.on();
+      greenLed.off();
+       state = RED;
+    }
+    break;
+    
+    case(RED):
+    if (res == true)
+    {
+      greenLed.on();
+      redLed.off();
+      greenTimer.set(1000);
+      state = GREEN;
+    }
+    break;
+  } 
+}
+
+bool buttonPushed()
+{
+  int returnValue = 0;
+  if (redButton.wasPushed())
   {
-    greenLed.off();
-    redLed.on();
+    returnValue = true;
   }
+  else
+  {
+    returnValue = false;
+  }
+  return returnValue;
 }
 
 bool lookingForCard()
 {
-  // Look for new cards
-  if ( ! mfrc522.PICC_IsNewCardPresent()) 
+  int returnValue = 0;
+  if (mfrc522.PICC_IsNewCardPresent()) { // (true, if RFID tag/card is present ) PICC = Proximity Integrated Circuit Card
+      returnValue = true;
+  }
+  else
   {
-    return;
+      returnValue = false;
   }
-  // Select one of the cards
-  if ( ! mfrc522.PICC_ReadCardSerial()) 
-  {
-    return;
-  }
-  //Show UID on serial monitor
-  Serial.print("UID tag :");
-  String content= "";
-  byte letter;
-  for (byte i = 0; i < mfrc522.uid.size; i++) 
-  {
-     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-     Serial.print(mfrc522.uid.uidByte[i], HEX);
-     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
-     content.concat(String(mfrc522.uid.uidByte[i], HEX));
-  }
-  Serial.println();
-  Serial.print("Message : ");
-  content.toUpperCase();
-  if (content.substring(1) == "DA 16 87 16") //change here the UID of the card/cards that you want to give access
-  {
-    Serial.println("Authorized access");
-    Serial.println();
-
-  }
- 
- else   {
-    Serial.println(" Access denied");
-
-  }
-} 
+  return returnValue;
+}
