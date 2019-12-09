@@ -114,19 +114,25 @@ int buttonPush()
 
 void detectItem()
 {
-  static MSTimer greenTimer;
-  enum{GREEN, RED};
+  enum{GREEN, GREEN_TEMP, RED};
   static int state = RED;
   bool res = lookingForCard();
 
   switch(state)
   {
     case(GREEN):
-    if (res == false and greenTimer.done())
+    if (res == false)
+    {
+       state = GREEN_TEMP;
+    }
+    break;
+
+    case(GREEN_TEMP):
+    if (res == false)
     {
       redLed.on();
       greenLed.off();
-       state = RED;
+      state = RED;
     }
     break;
     
@@ -135,7 +141,6 @@ void detectItem()
     {
       greenLed.on();
       redLed.off();
-      greenTimer.set(1000);
       state = GREEN;
     }
     break;
