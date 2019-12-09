@@ -56,15 +56,10 @@ void loop()
 {
 	// Call your control function(s) here 
   detectItem();
-  if (buttonPushed())
+  if (redButton.wasPushed())
   {
     Serial.print("1");
   }
-  else
-  {
-    Serial.print("0");
-  }
-  
 }
 
 void detectItem()
@@ -95,20 +90,6 @@ void detectItem()
     }
     break;
   } 
-}
-
-bool buttonPushed()
-{
-  int returnValue = 0;
-  if (redButton.wasPushed())
-  {
-    returnValue = true;
-  }
-  else
-  {
-    returnValue = false;
-  }
-  return returnValue;
 }
 
 bool lookingForCard()
