@@ -294,49 +294,85 @@ void setup()
 
 void loop() 
 {
-
-  buzzerSong();
+  lostMode();
 	
 }
 
-int tracker()
+int checkSerial()
 {
-  static int lost = false;
+  enum {ONE, ZERO, NOTHING};
+  static int state = NOTHING;
+  int returnValue = 2;
+  int lost = 1;
   
-  if (Serial.available())
+  switch(state)
   {
-    lost = Serial.parseInt();
-    
-    if (lost == true)
+    case NOTHING:
+    if (Serial.available())
     {
-      lostMode();
+      lost = Serial.parseInt();
+      if (lost == 1)
+      {
+       state = ONE;
+       Serial.print("state one");
+      }
+      else if (lost == 0)
+      {
+       state = ZERO;
+      Serial.print("state zero");
+      }
     }
+    else
+    {
+      returnValue = 2;
+    }
+    break;
+
+    case ONE:
+    returnValue = 1;
+    state = NOTHING;
+    break;
+
+    case ZERO:
+    returnValue = 0;
+    state = NOTHING;
+    break;
   }
+  return returnValue;
 }
 
 void lostMode()
 {
   enum{OFF, LOST};
   static int state = OFF;
-  int value = Serial.parseInt();
+  static int endFlag = false;
+  int value = checkSerial();
 
   switch(state)
   {
-    case OFF:
-      if (value == true)
+    case LOST:
+      if (value == 0)
+      {
+        endFlag = true;
+        state = OFF;
+      }
+      else
       {
         blinkLed();
-        buzzerSong();
-        state = LOST;
+        buzzerSong(endFlag);
+        endFlag = false;
       }
     break;
 
-    case LOST:
-      if(value == false)
+    case OFF:
+      if(value == 1)
+      {
+        state = LOST;
+      }
+      else
       {
         myLed.off();
         noTone(buzzer);
-        state = OFF;
       }
     break;
   }
@@ -355,62 +391,53 @@ void blinkLed()
     if (ledOnFlag == false)
     {
       myLed.on();
-      Serial.print("hi");
       ledOnFlag = true;
     }
     else
     {
       myLed.off();
-      Serial.print("bitch");
       ledOnFlag = false;
     }
   }
 }
 
-int buzzerSong()
+int buzzerSong(int endFlag)
 {
   static int thisNote = 0;
   static MSTimer songTimer;
-  int endFlag = false;
 
   if(endFlag == true)
   {
     noTone(buzzer);
+    songTimer.set(0);
     thisNote = 0;
   }
   
-  else if (songTimer.done() == true && thisNote < notes * 2)
+  else if (songTimer.done() == true && thisNote >= notes * 2)
   {
     thisNote = 0;
   }
  
   else if (songTimer.done() == true)
-  {
-    for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2)
+  { 
+    divider = pgm_read_word_near(melody+thisNote + 1);
+    
+    if (divider > 0) 
     {
-      divider = pgm_read_word_near(melody+thisNote + 1);
+      noteDuration = (wholenote) / divider;
+    } 
     
-      if (divider > 0) 
-      {
-        noteDuration = (wholenote) / divider;
-      } 
-    
-      else if (divider < 0) 
-      {
-        noteDuration = (wholenote) / abs(divider);
-        noteDuration *= 1.5; 
-      }
-    
-      tone(buzzer, pgm_read_word_near(melody+thisNote), noteDuration * 0.9);
-      songTimer.set(noteDuration);
-    
-     if (songTimer.done() == true)
-      {
-        noTone(buzzer);
-        songTimer.set(noteDuration);    
-      }
-    
+    else if (divider < 0) 
+    {
+      noteDuration = (wholenote) / abs(divider);
+      noteDuration *= 1.5; 
     }
+
+    noTone(buzzer);
+    tone(buzzer, pgm_read_word_near(melody+thisNote), noteDuration * 0.9);
+
+    thisNote = thisNote + 2;
+    songTimer.set(noteDuration);
   }
 }
 
