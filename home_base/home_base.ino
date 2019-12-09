@@ -56,10 +56,60 @@ void loop()
 {
 	// Call your control function(s) here 
   detectItem();
-  if (redButton.wasPushed())
+  printButton();
+}
+
+void printButton()
+{
+  int buttonStatus = buttonPush();
+  if (buttonStatus == 1)
   {
     Serial.print("1");
   }
+  else if (buttonStatus == 0)
+  {
+    Serial.print("0");
+  }
+  else if (buttonStatus == 2)
+  {
+    //do nothing 
+  }
+  
+}
+
+int buttonPush()
+{
+  enum {NOT_PUSHED, ONCE, TWICE};
+  static int state = NOT_PUSHED;
+  int returnValue = 2;
+  
+  switch(state)
+  {
+    case NOT_PUSHED:
+    if (redButton.wasPushed())
+    {
+      returnValue = 1;
+      state = ONCE;
+    }
+    break;
+
+    case ONCE:
+    if (redButton.wasPushed())
+    {
+      returnValue = 0;
+      state = TWICE;
+    }
+    break;
+
+    case TWICE:
+    returnValue = 2;
+    state = NOT_PUSHED;
+    break;
+
+    return returnValue;
+  }
+  
+  return returnValue;
 }
 
 void detectItem()
