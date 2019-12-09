@@ -1,5 +1,5 @@
 // CPE123 - Embedded systems and robotics 
-// Name: Kitty, Van, Vincent, Kin, Briana   Team: 10
+// Name: Kitty, Vincent, Kin, Briana, Van   Team: 10
 // Simply Tracking 
 
 #include <CPutil.h>
@@ -373,6 +373,7 @@ int buzzerSong()
   for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2)
   {
 
+          
     divider = pgm_read_word_near(melody+thisNote + 1);
     if (divider > 0) 
     {
@@ -385,16 +386,10 @@ int buzzerSong()
       noteDuration *= 1.5; 
     }
 
+      tone(buzzer, pgm_read_word_near(melody+thisNote), noteDuration * 0.9);
 
-    tone(buzzer, pgm_read_word_near(melody+thisNote), noteDuration * 0.9);
+      delay(noteDuration);
 
-
-    delay(noteDuration);
-
-
-    noTone(buzzer);
-
-    
+      noTone(buzzer);
+    }
   }
-  
-}
