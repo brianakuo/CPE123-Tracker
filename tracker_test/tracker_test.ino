@@ -287,6 +287,7 @@ void setup()
 	Serial.begin(9600);
 	setupMessage(__FILE__, "Put a start message here");
 	delay(500); 
+  
 	  
   myLed.off();
  
@@ -294,8 +295,8 @@ void setup()
 
 void loop() 
 {
-  lostMode();
-	
+  int value = checkSerial();
+  lostMode(value);
 }
 
 int checkSerial()
@@ -341,12 +342,12 @@ int checkSerial()
   return returnValue;
 }
 
-void lostMode()
+void lostMode(int lol)
 {
   enum{OFF, LOST};
   static int state = OFF;
   static int endFlag = false;
-  int value = checkSerial();
+  int value = lol;
 
   switch(state)
   {
@@ -360,7 +361,9 @@ void lostMode()
       {
         blinkLed();
         buzzerSong(endFlag);
+        delay(5000);
         endFlag = false;
+        Serial.print("off");
       }
     break;
 
@@ -373,6 +376,7 @@ void lostMode()
       {
         myLed.off();
         noTone(buzzer);
+        Serial.print("lost");
       }
     break;
   }
