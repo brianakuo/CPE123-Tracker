@@ -21,26 +21,47 @@ void setup()
   redLed.off();
 }
 
-void setup90
-{
-  Serial2.begin(9600);
-}
-
 void loop() 
 {
   // put your main code here, to run repeatedly:
-   readSerial();
+  readSerial();
 }
 
 bool readSerial()
 {
-  int buttonPushed = 0;
-  if (Serial.available())
-    buttonPushed = Serial.parseInt();
-    if (buttonPushed == "1")
-    {
-      blinkLed();
-    }
+  enum{PUSHED,NOT_PUSHED};
+  int buttonPushed = false;
+  static int state = NOT_PUSHED;
+
+  switch(state)
+  {
+    case NOT_PUSHED:
+      if (Serial.available())
+      {
+          buttonPushed = Serial.parseInt();
+          if (buttonPushed == true)
+          {
+           state = PUSHED;
+           Serial.print("pushed");
+          }
+      }
+      break;
+
+    case PUSHED:
+      if (Serial.available())
+      {
+          buttonPushed = Serial.parseInt();
+          if (buttonPushed == true)
+          {
+           state = NOT_PUSHED;
+          }
+      }
+      else
+      {
+          blinkLed();
+      }
+      break;
+  }
 }
 
 void blinkLed()
