@@ -64,11 +64,11 @@ void printButton()
   int buttonStatus = buttonPush();
   if (buttonStatus == 1)
   {
-    Serial.print("1");
+    Serial.print(1);
   }
   else if (buttonStatus == 0)
   {
-    Serial.print("0");
+    Serial.print(0);
   }
   else if (buttonStatus == 2)
   {
