@@ -47,7 +47,7 @@ void setup()
 	delay(500); 
 	
 	// Initialize your hardware
-  redLed.off();
+  redLed.on();
   greenLed.off();
  
 }
@@ -64,11 +64,11 @@ void printButton()
   int buttonStatus = buttonPush();
   if (buttonStatus == 1)
   {
-    Serial.print("1");
+    Serial.print(1);
   }
   else if (buttonStatus == 0)
   {
-    Serial.print("0");
+    Serial.print(0);
   }
   else if (buttonStatus == 2)
   {
@@ -120,23 +120,27 @@ void detectItem()
 
   switch(state)
   {
-    case(GREEN):
+    case GREEN:
     if (res == false)
     {
-       state = GREEN_TEMP;
+     state = GREEN_TEMP;
     }
     break;
 
-    case(GREEN_TEMP):
+    case GREEN_TEMP:
     if (res == false)
     {
       redLed.on();
       greenLed.off();
       state = RED;
     }
+    else 
+    {
+     state = GREEN;
+    }
     break;
     
-    case(RED):
+    case RED:
     if (res == true)
     {
       greenLed.on();
